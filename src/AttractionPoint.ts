@@ -4,9 +4,8 @@ import { Rect } from './core/Rect';
 import { Colors } from './core/Colors'
 import * as PIXI from "pixi.js"
 
-export class Leaf
+export class AttractionPoint
 {        
-    
     position: Vector2;
     closedBranch: Branch;
     private width = 1;

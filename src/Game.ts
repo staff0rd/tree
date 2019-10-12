@@ -3,6 +3,7 @@ import { Config } from './Config';
 import { Analytics } from "./core/Analytics";
 import { Point } from "./core/Point";
 import { Tree } from './Tree';
+import { throwStatement } from "@babel/types";
 
 export class Game {
     private pixi: PIXI.Application;
@@ -11,6 +12,7 @@ export class Game {
     private tree: Tree;
     private growInterval: any;
     private stage: PIXI.Container;
+    private status: PIXI.Text;
 
     constructor(config: Config, pixi: PIXI.Application) {
         this.pixi = pixi;
@@ -19,7 +21,8 @@ export class Game {
         this.initInteraction();
         
         this.stage = new PIXI.Container();
-        this.pixi.stage.addChild(this.stage);
+        this.status = new PIXI.Text("");
+        this.pixi.stage.addChild(this.stage, this.status);
 
         window.onresize = () => {
             this.pixi.view.width = window.innerWidth;
@@ -45,8 +48,9 @@ export class Game {
 
     init() {
         Analytics.buttonClick("rengenerate");
-
+        this.tree && this.stage.removeChild(this.tree.view);
         this.tree = new Tree(new Point(window.innerWidth/2/this.config.scale, window.innerHeight/this.config.scale), this.config.scale);
+        this.stage.addChild(this.tree.view);
         this.growInterval && clearInterval(this.growInterval);
         this.growInterval = setInterval(() => {
             this.draw();
@@ -55,13 +59,12 @@ export class Game {
     }
 
     draw() {
-        this.stage.removeChildren();
         const status = this.tree.doneGrowing ? "Done" : "Growing";
-        const text = new PIXI.Text(`Status: ${status}`);
-        text.pivot.set(0,text.height);
-        text.position.set(5, window.innerHeight - 5);
+        const message = `Status: ${status}\n` + this.tree.status;
+        this.status.text = message;
+        this.status.pivot.set(0,this.status.height);
+        this.status.position.set(5, window.innerHeight - 5);
         this.tree.Draw();
         this.tree.view.scale.set(this.config.scale);        
-        this.stage.addChild(text, this.tree.view);
     }
 }

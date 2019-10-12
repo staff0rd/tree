@@ -3,7 +3,7 @@ import { Branch } from './Branch'
 import { Point as Vector2 } from './core/Point'
 import { Random } from './core/Random'
 import { Rect } from './core/Rect'
-import { Leaf } from './Leaf'
+import { AttractionPoint } from './AttractionPoint'
 
 export class Tree
 {
@@ -20,7 +20,7 @@ export class Tree
     branchLength = 2;
 
     root: Branch;
-    leaves: Leaf[];
+    leaves: AttractionPoint[];
     branches: { [key: string]: Branch };
 
     crown: Rect;
@@ -61,7 +61,7 @@ export class Tree
         for (let i = 0; i < this.leafCount; i++)
         {
             const location = new Vector2(Random.between(this.crown.left, this.crown.right + 1), Random.between(this.crown.top, this.crown.bottom + 1));
-            let leaf = new Leaf(location);
+            let leaf = new AttractionPoint(location);
             this.leaves.push(leaf);
         }
     }
@@ -193,13 +193,15 @@ export class Tree
         for (let b of Object.values(this.branches))
             b.draw(this.branchView);
 
-        console.log("Total Branches: " + this.branches.length);
-        console.log("Total Leaves: " + this.leaves.length);
-        console.log("Crown Width: " + this.treeWidth);
-        console.log("Crown Height: " + this.treeHeight);
-        console.log("Trunk Height: " + this.trunkHeight);
-        console.log("Min. Leaf Distance: " + this.minDistance);
-        console.log("Max. Leaf Distance: " + this.maxDistance);
-        console.log("Branch Length: " + this.branchLength);
+    }
+    get status() {
+        return "Total Branches: " + Object.values(this.branches).length + "\n" +
+        "Total Leaves: " + this.leaves.length + "\n" +
+        "Crown Width: " + this.treeWidth + "\n" +
+        "Crown Height: " + this.treeHeight + "\n" +
+        "Trunk Height: " + this.trunkHeight + "\n" +
+        "Min. Leaf Distance: " + this.minDistance + "\n" +
+        "Max. Leaf Distance: " + this.maxDistance + "\n" +
+        "Branch Length: " + this.branchLength + "\n";
     }
 }
