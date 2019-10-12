@@ -7,143 +7,132 @@ import { Leaf } from './Leaf'
 
 export class Tree
 {
-    DoneGrowing = false;
+    doneGrowing = false;
 
-    Position = new Vector2(0, 0);
+    position = new Vector2(0, 0);
 
-    LeafCount = 400;
-    TreeWidth = 80;    
-    TreeHeight = 150;   
-    TrunkHeight = 40;
-    MinDistance = 2;
-    MaxDistance = 15;
-    BranchLength = 2;
+    leafCount = 400;
+    treeWidth = 80;    
+    treeHeight = 150;   
+    trunkHeight = 40;
+    minDistance = 2;
+    maxDistance = 15;
+    branchLength = 2;
 
-    Root: Branch;
-    Leaves: Leaf[];
-    Branches: { [key: string]: Branch };
+    root: Branch;
+    leaves: Leaf[];
+    branches: { [key: string]: Branch };
 
-    Crown: Rect;
+    crown: Rect;
   
     view: PIXI.Container;
     private leafView: PIXI.Graphics;
     private branchView: PIXI.Graphics;
+    private scale: number;
+    private margin = 20;
 
-    constructor(position: Vector2) {
-        
-        this.Position = position;
+    constructor(position: Vector2, scale: number) {
+        this.scale = scale;
+        this.position = position;
         this.view = new PIXI.Container();
         this.leafView = new PIXI.Graphics();
         this.branchView = new PIXI.Graphics();
+        this.view.addChild(this.branchView, this.leafView);
+        
+        this.leafCount = Random.between(400, 600);
+        this.trunkHeight = Random.between(window.innerHeight / scale * .05, window.innerHeight / scale * .35);
+        const maxHeight = window.innerHeight / this.scale - this.margin - this.trunkHeight;
+        this.treeWidth = Random.between(window.innerHeight / this.scale * .2, window.innerHeight / this.scale * .75);
+        this.treeHeight = Random.between(maxHeight * .75, maxHeight);
+        this.minDistance = Random.between(3, 8);
+        this.maxDistance = Random.between(15, 30);
+        this.branchLength = Random.between(2, 6);
 
-        this.LeafCount = Random.between(400, 600);
-        this.TreeWidth = Random.between(50, 200);
-        this.TreeHeight = Random.between(100, 150);
-        this.TrunkHeight = Random.between(30, 60);
-        this.MinDistance = Random.between(2, 4);
-        this.MaxDistance = Random.between(15, 30);
-        this.BranchLength = Random.between(2, 6);
-
-        //LoadContent(gd, content);
-        this.GenerateCrown();
-        this.GenerateTrunk();
+        this.generateCrown();
+        this.generateTrunk();
     }
 
-    // private void LoadContent(GraphicsDevice gd, ContentManager content)
-    // {
-    //     int width = 10, height = 10;
-    //     BlankTexture = new Texture2D(gd, 10, 10, false, SurfaceFormat.Color);
-    //     Color[] color = new Color[width * height];
-    //     for (int i = 0; i < color.Length; i++)
-    //     {
-    //         color[i] = Color.White;
-    //     }
-    //     BlankTexture.SetData(color);
-        
-    //     Font = content.Load<SpriteFont>(@"font");
-    // }
-
-    private GenerateCrown()
+    private generateCrown()
     {
-        this.Crown = new Rect(this.Position.x - this.TreeWidth / 2, this.Position.y - this.TreeHeight - this.TrunkHeight, this.TreeWidth, this.TreeHeight);
-        this.Leaves = [];
+        this.crown = new Rect(this.position.x - this.treeWidth / 2, this.position.y - this.treeHeight - this.trunkHeight, this.treeWidth, this.treeHeight);
+        this.leaves = [];
         
         //randomly place leaves within our rectangle
-        for (let i = 0; i < this.LeafCount; i++)
+        for (let i = 0; i < this.leafCount; i++)
         {
-            const location = new Vector2(Random.between(this.Crown.left, this.Crown.right + 1), Random.between(this.Crown.top, this.Crown.bottom + 1));
+            const location = new Vector2(Random.between(this.crown.left, this.crown.right + 1), Random.between(this.crown.top, this.crown.bottom + 1));
             let leaf = new Leaf(location);
-            this.Leaves.push(leaf);
+            this.leaves.push(leaf);
         }
     }
     
-    private GenerateTrunk()
+    private generateTrunk()
     {
-        this.Branches = {};
+        this.branches = {};
 
-        this.Root = new Branch(null, this.Position, new Vector2(0, -1));
-        this.Branches[this.Root.position.toString()] = this.Root;
+        this.root = new Branch(null, this.position, new Vector2(0, -1));
+        this.branches[this.root.position.toString()] = this.root;
 
-        let current = new Branch(this.Root, new Vector2(this.Position.x, this.Position.y - this.BranchLength), new Vector2(0, -1));
-        this.Branches[current.position.toString()] = current;
+        let current = new Branch(this.root, new Vector2(this.position.x, this.position.y - this.branchLength), new Vector2(0, -1));
+        this.branches[current.position.toString()] = current;
 
         //Keep growing trunk upwards until we reach a leaf       
-        while (this.Root.position.subtract(current.position).length < this.TrunkHeight)
+        while (this.root.position.subtract(current.position).length < this.trunkHeight)
         {
-            const trunk = new Branch(current, new Vector2(current.position.x, current.position.y - this.BranchLength), new Vector2(0, -1));
-            this.Branches[trunk.position.toString()] = trunk;
+            const trunk = new Branch(current, new Vector2(current.position.x, current.position.y - this.branchLength), new Vector2(0, -1));
+            this.branches[trunk.position.toString()] = trunk;
             current = trunk;                
         }         
     }
 
     Grow()
     {
-        if (this.DoneGrowing) return;
+        if (this.doneGrowing) return;
 
         //If no leaves left, we are done
-        if (this.Leaves.length == 0) { this.DoneGrowing = true; return; }
+        if (this.leaves.length == 0) { this.doneGrowing = true; return; }
 
         //process the leaves
-        for (let i = 0; i < this.Leaves.length; i++)
+        for (let i = 0; i < this.leaves.length; i++)
         {
             let leafRemoved = false;
 
-            this.Leaves[i].closedBranch = null;
+            this.leaves[i].closedBranch = null;
             let direction = new Vector2(0, 0);
 
             //Find the nearest branch for this leaf
             
-            for (let b of Object.values(this.Branches))
+            for (let b of Object.values(this.branches))
             {
-                direction = this.Leaves[i].position.subtract(b.position);                       //direction to branch from leaf
+                direction = this.leaves[i].position.subtract(b.position);                       //direction to branch from leaf
                 const distance = Math.round(direction.length);           // TODO: check round
                 direction = direction.normalized;
 
-                if (distance <= this.MinDistance)            //Min leaf distance reached, we remove it
+                if (distance <= this.minDistance)            //Min leaf distance reached, we remove it
                 {
-                    this.Leaves.splice(this.Leaves.indexOf(this.Leaves[i]), 1);
+                    this.leaves.splice(this.leaves.indexOf(this.leaves[i]), 1);
                     i--;
                     leafRemoved = true;
                     break;
                 }
-                else if (distance <= this.MaxDistance)       //branch in range, determine if it is the nearest
+                else if (distance <= this.maxDistance)       //branch in range, determine if it is the nearest
                 {
-                    if (this.Leaves[i].closedBranch == null)
-                        this.Leaves[i].closedBranch = b;
-                    else if (this.Leaves[i].position.subtract(this.Leaves[i].closedBranch.position).length > distance)
-                        this.Leaves[i].closedBranch = b;
+                    if (this.leaves[i].closedBranch == null)
+                        this.leaves[i].closedBranch = b;
+                    else if (this.leaves[i].position.subtract(this.leaves[i].closedBranch.position).length > distance)
+                        this.leaves[i].closedBranch = b;
                 }
             }
 
             if (!leafRemoved)
             {
                 //Set the grow parameters on all the closest branches that are in range
-                if (this.Leaves[i].closedBranch != null)
+                if (this.leaves[i].closedBranch != null)
                 {
-                    const dir = this.Leaves[i].position.subtract(this.Leaves[i].closedBranch.position);
-                    const closedBranch = this.Leaves[i].closedBranch;
-                    closedBranch.GrowDirection = this.Leaves[i].closedBranch.GrowDirection.add(dir.normalized);       //add to grow direction of branch
-                    closedBranch.GrowCount++;
+                    const dir = this.leaves[i].position.subtract(this.leaves[i].closedBranch.position);
+                    const closedBranch = this.leaves[i].closedBranch;
+                    closedBranch.growDirection = this.leaves[i].closedBranch.growDirection.add(dir.normalized);       //add to grow direction of branch
+                    closedBranch.growCount++;
                 }
             }
         }
@@ -151,38 +140,38 @@ export class Tree
         //Generate the new branches
         const newBranches = new Set<Branch>();
 
-        for(let b of Object.values(this.Branches))
+        for(let b of Object.values(this.branches))
         {
-            if (b.GrowCount > 0)    //if at least one leaf is affecting the branch
+            if (b.growCount > 0)    //if at least one leaf is affecting the branch
             {
-                const avgDirection = b.GrowDirection.divide(b.GrowCount).normalized;
+                const avgDirection = b.growDirection.divide(b.growCount).normalized;
 
-                const newBranch = new Branch(b, b.position.add(avgDirection.multiply(this.BranchLength)), avgDirection);
+                const newBranch = new Branch(b, b.position.add(avgDirection.multiply(this.branchLength)), avgDirection);
 
                 newBranches.add(newBranch);
-                b.Reset();
+                b.reset();
             }
         }
 
-        if (newBranches.size == 0) { this.DoneGrowing = true; return; }
+        if (newBranches.size == 0) { this.doneGrowing = true; return; }
 
         //Add the new branches to the tree
         let branchAdded = false;
         newBranches.forEach(b => {
             //Check if branch already exists.  These cases seem to happen when leaf is in specific areas
-            let existing = this.Branches[b.position.toString()];
+            let existing = this.branches[b.position.toString()];
             if (!existing)
             {
-                this.Branches[b.position.toString()] = b;
+                this.branches[b.position.toString()] = b;
                 branchAdded = true;
 
                 //increment the size of the older branches, direct path to root
-                b.Size = 0.002;
+                b.size = Branch.initialSize;
                 let p = b.parent;
                 while (p != undefined)
                 {
                     if (p.parent != undefined)
-                        p.parent.Size = p.Size + 0.001;
+                        p.parent.size = p.size + Branch.growIncrement;
 
                     p = p.parent;
                 }
@@ -190,7 +179,7 @@ export class Tree
         });
 
         if (!branchAdded) 
-            this.DoneGrowing = true;
+            this.doneGrowing = true;
     }
 
     public Draw()
@@ -198,23 +187,19 @@ export class Tree
         this.leafView.clear();
         this.branchView.clear();
         
-        for (let l of this.Leaves)
+        for (let l of this.leaves)
             l.draw(this.leafView);
 
-        for (let b of Object.values(this.Branches))
+        for (let b of Object.values(this.branches))
             b.draw(this.branchView);
 
-        this.view.addChild(this.branchView, this.leafView);
-
-        // spritebatch.DrawString(Font, "CONTROLS:  P = New Random Tree,  Spacebar = Grow Tree,  MouseWheel = Zoom,  J/I/K/L = Move Camera", new Vector2(0, 0), Color.Black);
-
-        console.log("Total Branches: " + this.Branches.length);
-        console.log("Total Leaves: " + this.Leaves.length);
-        console.log("Crown Width: " + this.TreeWidth);
-        console.log("Crown Height: " + this.TreeHeight);
-        console.log("Trunk Height: " + this.TrunkHeight);
-        console.log("Min. Leaf Distance: " + this.MinDistance);
-        console.log("Max. Leaf Distance: " + this.MaxDistance);
-        console.log("Branch Length: " + this.BranchLength);
+        console.log("Total Branches: " + this.branches.length);
+        console.log("Total Leaves: " + this.leaves.length);
+        console.log("Crown Width: " + this.treeWidth);
+        console.log("Crown Height: " + this.treeHeight);
+        console.log("Trunk Height: " + this.trunkHeight);
+        console.log("Min. Leaf Distance: " + this.minDistance);
+        console.log("Max. Leaf Distance: " + this.maxDistance);
+        console.log("Branch Length: " + this.branchLength);
     }
 }

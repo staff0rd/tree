@@ -5,34 +5,33 @@
 
     export class Branch
     {
+        static readonly growIncrement = .1;
+        static readonly initialSize = .2;
         parent: Branch;
-        GrowDirection: Vector2;
-        OriginalGrowDirection: Vector2;
-        GrowCount: number;
+        growDirection: Vector2;
+        originalGrowDirection: Vector2;
+        growCount: number;
         position: Vector2;
-        Size: number;
+        size: number;
 
         constructor(parent: Branch, position: Vector2, growDirection: Vector2) {
             this.parent = parent;
             this.position = position;
-            this.GrowDirection = growDirection;
-            this.OriginalGrowDirection = growDirection;
-            this.Size = 0.002;
-            this.GrowCount = 0;
+            this.growDirection = growDirection;
+            this.originalGrowDirection = growDirection;
+            this.size = Branch.initialSize;
+            this.growCount = 0;
         }
 
-        Reset()
+        reset()
         {
-            this.GrowCount = 0;
-            this.GrowDirection = this.OriginalGrowDirection;
+            this.growCount = 0;
+            this.growDirection = this.originalGrowDirection;
         }
 
         private drawLine(g: PIXI.Graphics, width: number, color: number, point1: Vector2, point2: Vector2)
         {
-            // const angle = Math.atan2(point2.y - point1.y, point2.x - point1.x);
-            // let length = point1.distance(point2);
-            // length = length / 10;
-            g.lineStyle(Math.max(width, 1), color)
+            g.lineStyle(Math.max(width, .33), color)
             .moveTo(point1.x, point1.y)
             .lineTo(point2.x, point2.y);
         }
@@ -40,7 +39,7 @@
         public draw(g: PIXI.Graphics)
         {
             if (this.parent != undefined)
-                 this.drawLine(g, Math.sqrt(this.Size), Colors.Brown.C500, this.position, this.parent.position);
+                 this.drawLine(g, Math.sqrt(this.size), Colors.Brown.C500, this.position, this.parent.position);
         }
     }
 

@@ -1,3 +1,4 @@
 export class Config {
-    growSpeed: number;
+    growSpeed = 50;
+    scale = 1.5;
 }

@@ -1,10 +1,8 @@
 import * as PIXI from "pixi.js";
 import { Config } from './Config';
 import { Analytics } from "./core/Analytics";
-import { Colors } from './core/Colors';
-import { PointValue } from './core/PointValue';
-import { Tree } from './Tree';
 import { Point } from "./core/Point";
+import { Tree } from './Tree';
 
 export class Game {
     private pixi: PIXI.Application;
@@ -45,12 +43,10 @@ export class Game {
         this.pixi.stage.addChild(this.interactionHitBox);
     }
 
-
-
     init() {
         Analytics.buttonClick("rengenerate");
 
-        this.tree = new Tree(new Point(0, 0));
+        this.tree = new Tree(new Point(window.innerWidth/2/this.config.scale, window.innerHeight/this.config.scale), this.config.scale);
         this.growInterval && clearInterval(this.growInterval);
         this.growInterval = setInterval(() => {
             this.draw();
@@ -60,13 +56,12 @@ export class Game {
 
     draw() {
         this.stage.removeChildren();
-        const status = this.tree.DoneGrowing ? "Done" : "Growing";
+        const status = this.tree.doneGrowing ? "Done" : "Growing";
         const text = new PIXI.Text(`Status: ${status}`);
         text.pivot.set(0,text.height);
         text.position.set(5, window.innerHeight - 5);
         this.tree.Draw();
-        this.tree.view.scale.set(3);
-        this.tree.view.position.set(this.tree.view.width + 20 , this.tree.view.height + 100);
+        this.tree.view.scale.set(this.config.scale);        
         this.stage.addChild(text, this.tree.view);
     }
 }

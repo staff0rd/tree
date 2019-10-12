@@ -16,7 +16,8 @@ export class App extends React.Component<AppProps, AppState> {
 
     getConfig() {
         const config = new Config();
-        config.growSpeed = Browser.getQueryNumber("growSpeed", 300);
+        config.growSpeed = Browser.getQueryNumber("growSpeed", config.growSpeed);
+        config.scale = Browser.getQueryNumber("scale", config.scale);
         return config;
     }
     
