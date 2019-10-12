@@ -1,24 +1,27 @@
 ﻿import { Point as Vector2 } from './core/Point'
 import { Branch } from './Branch'
 import { Rect } from './core/Rect';
+import { Colors } from './core/Colors'
+import * as PIXI from "pixi.js"
 
 export class Leaf
 {        
-
-    Position: Vector2;
-    ClosestBranch: Branch;
-    public get rect() {
-        return new Rect(this.Position.x, this.Position.y, 1, 1); 
-    }
+    
+    position: Vector2;
+    closedBranch: Branch;
+    private width = 1;
+    private height = 1;
+    public get rect() { return new Rect(this.position.x, this.position.y, this.width, this.height); }
 
     constructor(position: Vector2)
     {
-        this.Position = position;
+        this.position = position;
     }
 
-    Draw()//SpriteBatch spritebatch)
+    draw(g: PIXI.Graphics)
     {
-        // spritebatch.Draw(Texture, Rectangle, Color.Green);
+        g.beginFill(Colors.Green.C500)
+            .drawRect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
     }
 }
 

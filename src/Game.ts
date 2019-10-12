@@ -50,12 +50,6 @@ export class Game {
     init() {
         Analytics.buttonClick("rengenerate");
 
-        const blueBox = new PIXI.Graphics()
-        .beginFill(Colors.Blue.C500)
-        .drawRect(100, 100, 100, 100)
-
-        this.pixi.stage.addChild(blueBox);
-
         this.tree = new Tree(new Point(0, 0));
         this.growInterval && clearInterval(this.growInterval);
         this.growInterval = setInterval(() => {
@@ -70,6 +64,9 @@ export class Game {
         const text = new PIXI.Text(`Status: ${status}`);
         text.pivot.set(0,text.height);
         text.position.set(5, window.innerHeight - 5);
-        this.stage.addChild(text);
+        this.tree.Draw();
+        this.tree.view.scale.set(3);
+        this.tree.view.position.set(this.tree.view.width + 20 , this.tree.view.height + 100);
+        this.stage.addChild(text, this.tree.view);
     }
 }

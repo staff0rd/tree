@@ -6,6 +6,10 @@ export class Point {
         this.y = y;
     }
     
+    toString() { 
+        return `(${this.x},${this.y})`
+    }
+
     public get length() {
         return Math.sqrt(this.x*this.x+this.y*this.y);
     }
@@ -24,6 +28,10 @@ export class Point {
 
     multiply(by: number) {
         return new Point(this.x * by, this.y * by);
+    }
+
+    distance(to: Point) {
+        return this.subtract(to).length;
     }
 
     public get normalized() {
