@@ -149,74 +149,59 @@ export class Tree
             {
                 const avgDirection = b.GrowDirection.divide(b.GrowCount).normalized;
 
-                const newBranch = new Branch(b, b.Position.add(avgDirection.multiply(BranchLength)), avgDirection, BlankTexture);
+                const newBranch = new Branch(b, b.Position.add(avgDirection.multiply(this.BranchLength)), avgDirection);
 
-                newBranches.Add(newBranch);
+                newBranches.add(newBranch);
                 b.Reset();
             }
         }
 
-        if (newBranches.Count == 0) { DoneGrowing = true; return; }
+        if (newBranches.size == 0) { this.DoneGrowing = true; return; }
 
         //Add the new branches to the tree
-        bool BranchAdded = false;
-        for (let b of newBranches)
-        {
+        let branchAdded = false;
+        newBranches.forEach(b => {
             //Check if branch already exists.  These cases seem to happen when leaf is in specific areas
-            Branch existing;
-            if (!Branches.TryGetValue(b.Position, out existing))
+            let existing = this.Branches[b.Position.toString()];
+            if (!existing)
             {
-                Branches.Add(b.Position, b);
-                BranchAdded = true;
+                this.Branches[b.Position.toString()] = b;
+                branchAdded = true;
 
                 //increment the size of the older branches, direct path to root
-                b.Size = 0.002f;
-                Branch p = b.Parent;
-                while (p != null)
+                b.Size = 0.002;
+                let p = b.Parent;
+                while (p != undefined)
                 {
-                    if (p.Parent != null)
-                        p.Parent.Size = p.Size + 0.001f;
+                    if (p.Parent != undefined)
+                        p.Parent.Size = p.Size + 0.001;
 
                     p = p.Parent;
-
                 }
             }
-        }
+        });
 
-        if (!BranchAdded) 
-            DoneGrowing = true;
+        if (!branchAdded) 
+            this.DoneGrowing = true;
     }
 
-    public void Draw(SpriteBatch spritebatch, Camera camera)
-    {
-        spritebatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, null, null, null, null, camera.View);
+    public Draw()
+    {        
+        for (let l of this.Leaves)
+            l.Draw();
 
-        foreach (Leaf l in Leaves)
-            l.Draw(spritebatch);
+        for (let b of Object.values(this.Branches))
+            b.Draw();
 
-        foreach (Branch b in Branches.Values)
-            b.Draw(spritebatch);
+        // spritebatch.DrawString(Font, "CONTROLS:  P = New Random Tree,  Spacebar = Grow Tree,  MouseWheel = Zoom,  J/I/K/L = Move Camera", new Vector2(0, 0), Color.Black);
 
-        spritebatch.End();
-        
-        //Draw Information
-        spritebatch.Begin();
-        spritebatch.DrawString(Font, "CONTROLS:  P = New Random Tree,  Spacebar = Grow Tree,  MouseWheel = Zoom,  J/I/K/L = Move Camera", new Vector2(0, 0), Color.Black);
-
-        spritebatch.DrawString(Font,"Total Branches: " + Branches.Count.ToString(), new Vector2(0,28), Color.White);
-        spritebatch.DrawString(Font, "Total Leaves: " + Leaves.Count.ToString(), new Vector2(0, 42), Color.White);
-        spritebatch.DrawString(Font, "Crown Width: " + TreeWidth.ToString(), new Vector2(0, 56), Color.White);
-        spritebatch.DrawString(Font, "Crown Height: " + TreeHeight.ToString(), new Vector2(0, 70), Color.White);
-        spritebatch.DrawString(Font, "Trunk Height: " + TrunkHeight.ToString(), new Vector2(0, 84), Color.White);
-        spritebatch.DrawString(Font, "Min. Leaf Distance: " + MinDistance.ToString(), new Vector2(0, 98), Color.White);
-        spritebatch.DrawString(Font, "Max. Leaf Distance: " + MaxDistance.ToString(), new Vector2(0, 112), Color.White);
-        spritebatch.DrawString(Font, "Branch Length: " + BranchLength.ToString(), new Vector2(0, 126), Color.White);
-
-        if (!DoneGrowing)
-            spritebatch.DrawString(Font, "Status: " + "Growing", new Vector2(0, 154), Color.White);
-        else
-            spritebatch.DrawString(Font, "Status: " + "Done", new Vector2(0, 154), Color.White);
-
-        spritebatch.End();
+        // spritebatch.DrawString(Font,"Total Branches: " + Branches.Count.ToString(), new Vector2(0,28), Color.White);
+        // spritebatch.DrawString(Font, "Total Leaves: " + Leaves.Count.ToString(), new Vector2(0, 42), Color.White);
+        // spritebatch.DrawString(Font, "Crown Width: " + TreeWidth.ToString(), new Vector2(0, 56), Color.White);
+        // spritebatch.DrawString(Font, "Crown Height: " + TreeHeight.ToString(), new Vector2(0, 70), Color.White);
+        // spritebatch.DrawString(Font, "Trunk Height: " + TrunkHeight.ToString(), new Vector2(0, 84), Color.White);
+        // spritebatch.DrawString(Font, "Min. Leaf Distance: " + MinDistance.ToString(), new Vector2(0, 98), Color.White);
+        // spritebatch.DrawString(Font, "Max. Leaf Distance: " + MaxDistance.ToString(), new Vector2(0, 112), Color.White);
+        // spritebatch.DrawString(Font, "Branch Length: " + BranchLength.ToString(), new Vector2(0, 126), Color.White);
     }
 }

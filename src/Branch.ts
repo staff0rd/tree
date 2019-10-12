@@ -32,10 +32,10 @@
         //     spritebatch.Draw(Texture, point1, null, color, angle, Vector2.Zero, new Vector2(length, width), SpriteEffects.None, 0);
         // }
 
-        // public void Draw(SpriteBatch spritebatch)
-        // {
-        //     if (Parent != null)
-        //         DrawLine(spritebatch, (float)Math.Sqrt(Size), Color.Brown, Position, Parent.Position);
-        // }
+        public Draw()
+        {
+            // if (Parent != null)
+            //     DrawLine(spritebatch, (float)Math.Sqrt(Size), Color.Brown, Position, Parent.Position);
+        }
     }
 

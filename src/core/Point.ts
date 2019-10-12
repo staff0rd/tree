@@ -22,8 +22,8 @@ export class Point {
         return new Point(this.x / by, this.y / by);
     }
 
-    multiply(by: Point) {
-        return new Point(this.x * by.x, this.y * by.y);
+    multiply(by: number) {
+        return new Point(this.x * by, this.y * by);
     }
 
     public get normalized() {

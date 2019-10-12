@@ -1,10 +1,9 @@
+import * as PIXI from "pixi.js";
 import * as React from "react";
-import * as PIXI from "pixi.js"
-import { Colors } from '../core/Colors'
-import { Game } from '../Game'
-import { Config } from '../Config'
+import { Config } from '../Config';
 import { Browser } from "../core/Browser";
-import { Random } from "../core/Random";
+import { Colors } from '../core/Colors';
+import { Game } from '../Game';
 
 export interface AppProps { compiler: string; framework: string; }
 
@@ -17,6 +16,7 @@ export class App extends React.Component<AppProps, AppState> {
 
     getConfig() {
         const config = new Config();
+        config.growSpeed = Browser.getQueryNumber("growSpeed", 300);
         return config;
     }
     
