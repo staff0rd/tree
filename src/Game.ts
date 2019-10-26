@@ -3,7 +3,6 @@ import { Config } from './Config';
 import { Analytics } from "./core/Analytics";
 import { Point } from "./core/Point";
 import { Tree } from './Tree';
-import { throwStatement } from "@babel/types";
 
 export class Game {
     private pixi: PIXI.Application;
@@ -21,7 +20,7 @@ export class Game {
         this.initInteraction();
         
         this.stage = new PIXI.Container();
-        this.status = new PIXI.Text("");
+        this.status = new PIXI.Text("", { fontSize: '16px'});
         this.pixi.stage.addChild(this.stage, this.status);
 
         window.onresize = () => {
@@ -54,7 +53,7 @@ export class Game {
         this.growInterval && clearInterval(this.growInterval);
         this.growInterval = setInterval(() => {
             this.draw();
-            this.tree.Grow();
+            this.tree.grow();
         }, this.config.growSpeed)
     }
 
@@ -64,7 +63,7 @@ export class Game {
         this.status.text = message;
         this.status.pivot.set(0,this.status.height);
         this.status.position.set(5, window.innerHeight - 5);
-        this.tree.Draw();
+        this.tree.draw();
         this.tree.view.scale.set(this.config.scale);        
     }
 }

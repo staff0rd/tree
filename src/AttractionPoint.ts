@@ -19,7 +19,7 @@ export class AttractionPoint
 
     draw(g: PIXI.Graphics)
     {
-        g.beginFill(Colors.Green.C500)
+        g.beginFill(Colors.Green.C700)
             .drawRect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
     }
 }
